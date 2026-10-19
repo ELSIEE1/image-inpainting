@@ -1,0 +1,53 @@
+# Local research material and recovery archive (never publish)
+/.local/
+/.cleanup_project.py
+/data/
+/checkpoints/
+/models/
+/outputs/
+/figures/
+/results/*
+!/results/metrics/
+/results/metrics/*
+!/results/metrics/historical/
+*.pth
+*.pt
+*.ckpt
+*.safetensors
+*.onnx
+*.flist
+*.zip
+*.tar
+*.gz
+*.7z
+# Prevent accidental nested Git repositories in the publication tree
+**/.git/
+# Environments, caches, editor and machine state
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+.ipynb_checkpoints/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+*.tmp
+*.bak
+# Credentials and local configuration
+.env
+.env.*
+*.pem
+*.key
+credentials*.json
+token*.json
+.aws/
+.codex/
+.agents/

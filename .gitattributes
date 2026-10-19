@@ -1,0 +1,6 @@
+* text=auto
+# Historical records must retain their exact original bytes.
+results/metrics/historical/*.csv -text
+splits/test_100.txt -text
+docs/edgeconnect_original_local_changes.patch -text
+*.png binary

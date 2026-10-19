@@ -1,0 +1,30 @@
+{
+  "EdgeModel_dis.pth": {
+    "bytes": 11119441,
+    "MiB": 10.604,
+    "sha256": "43833dab60582164b672d085530e0a71ace4f74b5cc4dc42f2f42ad33baf29f0",
+    "role": "training discriminator",
+    "provenance": "requires confirmation; no verified download URL"
+  },
+  "EdgeModel_gen.pth": {
+    "bytes": 43263593,
+    "MiB": 41.259,
+    "sha256": "f30b1f93f05112cce65c9c4d1301132e9054781be24df351627fb23d8cb5f70d",
+    "role": "inference generator",
+    "provenance": "requires confirmation; no verified download URL"
+  },
+  "InpaintingModel_dis.pth": {
+    "bytes": 11123667,
+    "MiB": 10.608,
+    "sha256": "5edb60734dbaf79d07526a852fb2d726fcc74ae868e8cd26b553cf1bd1770a21",
+    "role": "training discriminator",
+    "provenance": "requires confirmation; no verified download URL"
+  },
+  "InpaintingModel_gen.pth": {
+    "bytes": 43108915,
+    "MiB": 41.112,
+    "sha256": "b2c6eae1ad1cd9e8405baf6e3a4e5bb52f0636f755e1a78d89822ccc4120e069",
+    "role": "inference generator",
+    "provenance": "requires confirmation; no verified download URL"
+  }
+}

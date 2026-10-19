@@ -1,0 +1,5 @@
+cff-version: 1.2.0
+message: "Please cite the accompanying undergraduate thesis. Author, institution, year, and final thesis URL require confirmation before release."
+title: "Hybrid Controllable Inpainting: Integrating Diffusion and GAN Mechanisms for Efficient Image Restoration"
+type: software
+abstract: "Research implementation comparing EdgeConnect GAN inpainting, Stable Diffusion inpainting, and sequential GAN-to-diffusion refinement."

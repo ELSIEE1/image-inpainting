@@ -1,0 +1,9 @@
+Original thesis contributions: all rights reserved pending the author's choice
+of a public reuse license. Public availability does not grant a general license
+to reproduce or redistribute these original contributions.
+
+This notice does not relicense third-party code, pretrained weights, datasets,
+or dataset-derived images. EdgeConnect remains under the original license in
+third_party/edge_connect/LICENSE.md (CC BY-NC 4.0). Other third-party components
+and assets retain their respective terms; see docs/third_party.md and
+assets/README.md.

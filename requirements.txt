@@ -1,0 +1,21 @@
+# Consolidated direct dependencies. Historical exact environment was not recorded.
+# Install a matching torch/torchvision pair appropriate for your CPU/CUDA platform.
+# This is a dependency inventory, not a validated lockfile; see docs/validation.md.
+torch
+torchvision
+diffusers
+transformers
+accelerate
+safetensors
+huggingface-hub
+datasets
+numpy
+scipy
+Pillow
+opencv-python
+scikit-image
+imageio
+PyYAML
+matplotlib>=3.9
+lpips
+future

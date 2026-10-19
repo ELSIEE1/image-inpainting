@@ -1,0 +1,97 @@
+Public repository tree (local data/checkpoints/results/recovery material excluded):
+
+.gitattributes
+.gitignore
+CITATION.cff
+LICENSE
+README.md
+assets/
+  README.md
+  lpips_bar.png
+  pipeline.svg
+  psnr_bar.png
+  qualitative_0004.png
+  ssim_bar.png
+configs/
+  gan.yml
+docs/
+  artifact_checksums.json
+  checkpoint_inventory.json
+  cleanup_changes.md
+  edgeconnect_original_local_changes.patch
+  first_commit_files.txt
+  pretrained_models.md
+  repository_tree.txt
+  reproducibility.md
+  third_party.md
+  validation.md
+examples/
+  README.md
+requirements.txt
+results/
+  metrics/
+    historical/
+      diffusion_lpips.csv
+      gan_lpips.csv
+      gan_metrics.csv
+      hybrid_lpips.csv
+      hybrid_metrics.csv
+      sd_metrics.csv
+scripts/
+  check_repository.py
+  edgeconnect_worker.py
+splits/
+  test_100.txt
+src/
+  __init__.py
+  diffusion/
+    __init__.py
+    baseline_sd_inpaint.py
+    run_sd_inpaintcoco.py
+  evaluation/
+    __init__.py
+    compute_lpips.py
+    eval_metrics.py
+    output.py
+    plot_metrics.py
+  gan/
+    __init__.py
+    run_edgeconnect.py
+  hybrid/
+    __init__.py
+    gan_infer.py
+    run_hybrid.py
+    sd_refine.py
+  utils/
+    __init__.py
+    check_dataset.py
+    compare_hybrid.py
+    export_dataset.py
+    make_compare_grid.py
+third_party/
+  edge_connect/
+    .gitignore
+    LICENSE.md
+    README.md
+    config.yml.example
+    main.py
+    requirements.txt
+    scripts/
+      download_model.sh
+      fid_score.py
+      flist.py
+      inception.py
+      metrics.py
+    setup.cfg
+    src/
+      __init__.py
+      config.py
+      dataset.py
+      edge_connect.py
+      loss.py
+      metrics.py
+      models.py
+      networks.py
+      utils.py
+    test.py
+    train.py

@@ -1,0 +1,9 @@
+{
+  "results/metrics/historical/gan_lpips.csv": "41718e9bba93ff600dba60d9cd60677a40c12c8967430165d1d37a5065059165",
+  "results/metrics/historical/diffusion_lpips.csv": "b3788275429cfaf79be77f686a2f31712a21642077d666765ec04363b4b828d5",
+  "results/metrics/historical/hybrid_lpips.csv": "d21c8fc62d1ffe69b814bc411fbcea5500e72a443a302779576c017c45c2d8b2",
+  "results/metrics/historical/gan_metrics.csv": "33f9a7df42289355281219e66ee1d528aea35805ff097cb60282b4f35c8276f8",
+  "results/metrics/historical/sd_metrics.csv": "ad3ed0b8e154f9b245e86b87f12c0c31870d43b7d1650d78a4a3e88bb010ebf5",
+  "results/metrics/historical/hybrid_metrics.csv": "6b73942e2d064a9fce4fefcef73885a05ffd3ccebd8652fedac5ba655f7d705f",
+  "splits/test_100.txt": "83a435b2b546c282df798aa9521c2072ba8c75744202e8a9fcabccf0d3c5ba7b"
+}

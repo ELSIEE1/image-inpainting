@@ -1,6 +1,6 @@
 # Validation
 
-Cleanup verification date: 2026-10-19. No model inference, training, metric regeneration, package installation, or remote publishing was performed.
+Initial cleanup verification snapshot: 2026-10-19, before the initial publication. At that stage, no model inference, training, metric regeneration, package installation, or remote publishing was performed. The initial repository was subsequently published as commit `0ae784e`.
 
 ## Passed checks
 
@@ -36,4 +36,4 @@ The original vendor test launcher, training launcher defaults, and auxiliary scr
 - The actual vendor single-channel mask branch was exercised against a local exported L-mode mask with image I/O supplied directly. It retained the same >0 threshold and avoided invalid RGB conversion; this is a narrow loader check, not a full scikit-image/GAN inference test.
 - AST comparisons also confirmed the original diffusion pipeline and hybrid refinement call arguments are unchanged.
 - Proposed publication text was scanned for local Windows user/project paths, GitHub/Hugging Face token patterns, and private-key headers; no matches were found. This is a targeted scan, not proof that all possible secrets or image metadata are absent.
-- Local Git repository initialized on `main`; no commits, staging, remote configuration, GitHub repository creation, or pushes.
+- At the end of the initial cleanup checks, Git had been initialized on `main` without commits or a remote. Publication followed in commit `0ae784e`; this bullet records the earlier validation stage.

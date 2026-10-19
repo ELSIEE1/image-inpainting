@@ -24,6 +24,7 @@ docs/
   repository_tree.txt
   reproducibility.md
   third_party.md
+  usage.md
   validation.md
 examples/
   README.md

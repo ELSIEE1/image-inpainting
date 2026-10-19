@@ -1,157 +1,105 @@
 # Hybrid Controllable Inpainting
 
-**Integrating Diffusion and GAN Mechanisms for Efficient Image Restoration**
+A Python image-inpainting project that explores how to fill masked image regions by combining **GAN reconstruction with Stable Diffusion refinement**. It compares a GAN baseline, a diffusion baseline, and a sequential hybrid pipeline on a fixed 100-image evaluation split.
 
-Undergraduate thesis research comparing an EdgeConnect GAN baseline, a pretrained Stable Diffusion inpainting baseline, and a sequential GAN → diffusion pipeline. This repository reorganizes the existing experimental implementation; it does not introduce a rewritten model or a jointly trained hybrid network.
+Developed for the undergraduate thesis *Hybrid Controllable Inpainting: Integrating Diffusion and GAN Mechanisms for Efficient Image Restoration*.
 
-## Motivation and architecture
+## My contribution
 
-GAN reconstruction and diffusion synthesis offer different balances of structural fidelity and perceptual quality. The hybrid experiment explores using a GAN reconstruction as the input to diffusion refinement. The thesis title describes the research objective; this repository does not establish a measured efficiency advantage or universal improvement over either baseline.
+My project work focuses on the integration and evaluation layer around existing models:
 
-![Hybrid pipeline](assets/pipeline.svg)
+- Connecting saved EdgeConnect reconstructions to a Stable Diffusion refinement stage.
+- Building batch inference workflows for the diffusion baseline and hybrid pipeline.
+- Exporting image/mask/target pairs from InpaintCOCO and evaluating outputs with PSNR, SSIM, and LPIPS.
+- Producing comparison figures and preserving the experiment's 100-sample split and historical CSV results.
 
-1. EdgeConnect predicts edges and completes the masked input.
-2. GAN outputs are saved as numbered PNG files.
-3. The hybrid loader reads those GAN results and the corresponding masks.
-4. Stable Diffusion inpainting refines each image using the original hybrid prompt, 50 steps, and guidance scale 7.5.
+The repository also includes portable CLI launchers and verification checks. **EdgeConnect and Stable Diffusion are third-party models**; the hybrid is a sequential integration, not a new model architecture or a jointly trained network.
 
-Refinement uses the existing `StableDiffusionInpaintPipeline` call. It is a sequential pipeline using saved images, not a custom diffusion sampler, strength-controlled restoration algorithm, or joint GAN/diffusion training procedure. White mask pixels indicate the region to inpaint.
+**Technologies:** Python, PyTorch/torchvision, Hugging Face Diffusers and Datasets, Stable Diffusion inpainting, NumPy, Pillow, OpenCV, scikit-image, LPIPS, and Matplotlib. Dependencies are listed in [requirements.txt](requirements.txt).
 
-## Installation
+## How the two stages work
 
-Use a Python environment compatible with your selected PyTorch/CUDA and Diffusers versions. The original exact package versions were not recorded; `requirements.txt` consolidates the direct dependencies but is **not a validated environment lockfile**.
+![GAN to diffusion pipeline](assets/pipeline.svg)
+
+1. **GAN reconstruction:** EdgeConnect predicts edges and completes the masked region, saving a coarse reconstruction.
+2. **Diffusion refinement:** the hybrid loader passes that saved RGB reconstruction and its mask to `StableDiffusionInpaintPipeline`, using the original hybrid prompt, 50 inference steps, and guidance scale 7.5.
+
+The standalone diffusion baseline runs on the input image instead of the GAN reconstruction. Prompts and preprocessing differ between the original experiments; those differences are preserved and [documented](docs/reproducibility.md).
+
+## Example and evaluation
+
+![Masked input, GAN, diffusion, hybrid, and target for sample 0004](assets/qualitative_0004.png)
+
+Left to right: masked input, GAN baseline, diffusion baseline, hybrid output, and dataset target. This is an existing selected sample, not a newly generated result or a claim of typical performance.
+
+- **PSNR ↑:** pixel reconstruction quality.
+- **SSIM ↑:** structural similarity.
+- **LPIPS ↓:** learned perceptual distance using AlexNet.
+
+The original split is preserved in [test_100.txt](splits/test_100.txt). PSNR/SSIM use full-image RGB comparisons, resizing predictions to target dimensions when needed. LPIPS resizes images to 256×256 and matches prediction directories by filename; those directories must contain the intended evaluation samples. The target is InpaintCOCO's edited `inpaint_image`.
+
+[Historical CSVs](results/metrics/historical/) · [PSNR plot](assets/psnr_bar.png) · [SSIM plot](assets/ssim_bar.png) · [LPIPS plot](assets/lpips_bar.png)
+
+The results illustrate a **trade-off between structural fidelity and perceptual quality**. The hybrid does not universally outperform the baselines, and no measured speedup is claimed. Historical results have not been regenerated or overwritten. See [asset provenance](assets/README.md) for the selected figure's outstanding attribution details.
+
+## Setup and basic usage
+
+Run commands from the repository root:
 
 ```sh
+git clone https://github.com/ELSIEE1/image-inpainting.git
+cd image-inpainting
 python -m venv .venv
-# Windows PowerShell: .venv\Scripts\Activate.ps1
-# Linux/macOS: source .venv/bin/activate
-python -m pip install --upgrade pip
+# Activate: .venv\Scripts\Activate.ps1 (PowerShell)
+# Or: source .venv/bin/activate (Linux/macOS)
 python -m pip install -r requirements.txt
 python scripts/check_repository.py
 ```
 
-Install a matching `torch` / `torchvision` pair for your hardware if the default package installation is unsuitable. CUDA is selected automatically when available; CPU is supported by the inference code but full diffusion inference has not been validated in this cleanup. See [validation](docs/validation.md) for what was actually tested.
+Install a matching PyTorch/torchvision pair for your hardware. Exact historical dependency versions were not recorded; requirements are not a validated lockfile. Import/help checks were verified, but full model inference was not validated in the cleanup environment. See [validation details](docs/validation.md).
 
-Run the following commands from the repository root. Module execution (`python -m ...`) is intentional and avoids import collisions with the isolated EdgeConnect package.
-
-## Dataset setup and the fixed split
-
-The original exporter uses [phiyodr/InpaintCOCO](https://huggingface.co/datasets/phiyodr/InpaintCOCO), test split, and preserves these mappings:
-
-- `coco_image` → `images/NNNN.png`
-- `mask` → `masks/NNNN.png`, converted to grayscale and thresholded at **>10**, producing 0/255 masks
-- `inpaint_image` → `gt/NNNN.png`
-
-The target is the dataset's edited `inpaint_image`, not an assumed original, uncorrupted photograph. Interpret restoration metrics with that target definition in mind.
+**Before inference:** export the dataset using the command below and supply verified EdgeConnect generator checkpoints at `checkpoints/edge_connect/`. Both diffusion paths retain `runwayml/stable-diffusion-inpainting`; `--model` accepts a verified local model directory. Weights are not included, exact checkpoint provenance remains unconfirmed, and current access to the original diffusion identifier has not been established. See [model setup](docs/pretrained_models.md) and the [detailed usage guide](docs/usage.md).
 
 ```sh
 python -m src.utils.export_dataset --output-dir data/InpaintCOCO_export
-```
-
-Do not re-export over an existing experimental dataset unless you intend to replace it. The original dataset revision was not recorded; `--revision` allows a confirmed revision to be specified for future exports. Current dataset ordering must be checked against the original export before claiming exact reconstruction of the experiment.
-
-`splits/test_100.txt` is the **byte-for-byte original manifest**, with the same 100 samples in the same order. Each row contains input, mask, and target paths relative to the exported dataset root. It is not a newly randomized split. The GAN wrapper passes its input/mask paths directly as lists; no committed absolute `.flist` files are needed. The exporter retains its original full-dataset local flist generation, but those files are ignored.
-
-## Pretrained models
-
-Place the verified EdgeConnect generator files in `checkpoints/edge_connect/`:
-
-```text
-EdgeModel_gen.pth
-InpaintingModel_gen.pth
-```
-
-Discriminator files are used for training, not required for inference. The four local checkpoint files are excluded from Git. Their specific dataset/training provenance is **not yet confirmed**; no download URL is asserted to reproduce these weights. Sizes and checksums are recorded in [the checkpoint inventory](docs/checkpoint_inventory.json).
-
-Both diffusion paths retain the original identifier `runwayml/stable-diffusion-inpainting`. Access to that identifier could not be verified during cleanup (the model-page request returned HTTP 401). Use `--model /path/to/verified/local/model` when needed. Do not silently substitute a different model. Diffusion weights, model revisions, VGG19 weights used by EdgeConnect losses, and LPIPS/AlexNet weights are not bundled. See [pretrained model notes](docs/pretrained_models.md).
-
-## Inference
-
-Validate the GAN launch configuration without model imports, downloads, or inference:
-
-```sh
 python -m src.gan.run_edgeconnect --dry-run
-```
-
-Run the three approaches:
-
-```sh
 python -m src.gan.run_edgeconnect --mode test
 python -m src.diffusion.run_sd_inpaintcoco
 python -m src.hybrid.run_hybrid
 ```
 
-Defaults write to `results/gan_inpaintcoco/`, `results/sd_inpaintcoco/`, and `results/hybrid_inpaintcoco/`. The hybrid command requires the GAN results first and preserves the original behavior of skipping existing output filenames. Use a separate output directory for a new experiment. GAN and diffusion baseline commands may overwrite matching output images.
+Export only to a new dataset location; do not overwrite an existing experiment. The hybrid requires GAN outputs first and skips existing hybrid filenames. Outputs are saved under `results/gan_inpaintcoco/`, `results/sd_inpaintcoco/`, and `results/hybrid_inpaintcoco/`. Paths are configurable through each command's `--help`.
 
-Paths are configurable, for example:
-
-```sh
-python -m src.gan.run_edgeconnect --data-root data/InpaintCOCO_export --list-file splits/test_100.txt --checkpoints checkpoints/edge_connect --output-dir results/gan_new
-python -m src.hybrid.run_hybrid --gan-dir results/gan_new --mask-dir data/InpaintCOCO_export/masks --list-file splits/test_100.txt --output-dir results/hybrid_new --model /path/to/verified/model
-```
-
-The separate single-image demo retains its original **mask inversion**, unlike the batch baseline:
+Evaluate predictions without replacing historical CSVs:
 
 ```sh
-python -m src.diffusion.baseline_sd_inpaint --image /path/to/input.jpg --mask /path/to/mask.jpg --output-dir results/demo
-```
-
-EdgeConnect training code is preserved. The provided configuration is test-only, with training/validation lists unset. To train, prepare a separate configuration with your training/validation image and mask lists, then use `python -m src.gan.run_edgeconnect --mode train --config configs/your_training.yml`. No diffusion or hybrid training script, training dataset, or thesis training history is supplied.
-
-## Evaluation
-
-The following commands create **new** files, separate from the protected historical results:
-
-```sh
-python -m src.evaluation.eval_metrics --gt_dir data/InpaintCOCO_export/gt --pred_dir results/gan_inpaintcoco --list_file splits/test_100.txt --out_csv results/metrics/new/gan_metrics.csv
-python -m src.evaluation.eval_metrics --gt_dir data/InpaintCOCO_export/gt --pred_dir results/sd_inpaintcoco --list_file splits/test_100.txt --out_csv results/metrics/new/sd_metrics.csv
 python -m src.evaluation.eval_metrics --gt_dir data/InpaintCOCO_export/gt --pred_dir results/hybrid_inpaintcoco --list_file splits/test_100.txt --out_csv results/metrics/new/hybrid_metrics.csv
 python -m src.evaluation.compute_lpips --output-dir results/metrics/new
-python -m src.evaluation.plot_metrics --metrics-dir results/metrics/historical --output-dir results/plots
 ```
 
-- **PSNR ↑ / SSIM ↑:** full-image RGB values in [0,1], `data_range=1.0`; predictions are bicubically resized to target dimensions only when shapes differ. SSIM uses `channel_axis=2`.
-- **LPIPS ↓:** original AlexNet LPIPS, RGB resized to 256×256 with the existing PIL default interpolation and normalized to [-1,1]. Files are paired by numeric filename prefix; `_edge`, `_masked`, and `_mask` debug outputs are excluded.
-- PSNR/SSIM use the manifest; LPIPS retains the original directory-based matching and does **not** independently enforce that split. Point it at directories containing only the intended experiment's predictions.
-- Original missing-pair skipping remains; check reported evaluated counts before comparing results. These are full-image metrics, not mask-only metrics.
+LPIPS evaluates all three prediction directories by default. See the [usage guide](docs/usage.md) for baseline evaluation, plotting, demo mask conventions, and training prerequisites.
 
-## Historical results and qualitative example
-
-The six CSVs under `results/metrics/historical/` are historical experimental outputs copied without regeneration. Their SHA-256 hashes and the split hash are checked by `scripts/check_repository.py`. The figures below are original saved plots, not newly computed results. The qualitative figure shows the existing selected sample `0004`; it is illustrative rather than evidence of typical performance.
-
-![GAN, diffusion, hybrid, and target comparison for sample 0004](assets/qualitative_0004.png)
-
-![Historical PSNR comparison](assets/psnr_bar.png)
-![Historical SSIM comparison](assets/ssim_bar.png)
-![Historical LPIPS comparison](assets/lpips_bar.png)
-
-Interpret the results as a **trade-off between structural fidelity and perceptual quality**. The hybrid does not universally outperform the GAN or diffusion baselines. The original experiments differ in prompts and preprocessing and do not isolate architecture as the only variable. No historical metrics were overwritten during cleanup. Image attribution/provenance still requires completion before publication; see [asset notes](assets/README.md).
-
-## Repository layout
+## Repository structure
 
 ```text
-src/
-  gan/                  # Portable launcher; vendor code runs in a subprocess
-  diffusion/            # Original batch baseline and single-image demo
-  hybrid/               # Saved GAN output → Stable Diffusion refinement
-  evaluation/           # PSNR/SSIM, LPIPS, plotting, historical-output guard
-  utils/                # Export, preview, and comparison figures
-third_party/edge_connect/ # Locally modified upstream code and original license
-configs/gan.yml          # Effective original test configuration, portable paths
-scripts/                 # Internal GAN worker and repository verification
-splits/test_100.txt       # Exact original 100-sample manifest
-assets/                  # Pipeline diagram + four selected historical figures
-examples/                # Demo instructions; no redistributed input dataset
-results/metrics/historical/ # Six immutable historical metric CSVs
-docs/                    # Methods, provenance, changes, checksums, validation
+src/gan/                    # Portable EdgeConnect launcher
+src/diffusion/              # Stable Diffusion baseline and single-image demo
+src/hybrid/                 # GAN output loading and diffusion refinement
+src/evaluation/             # PSNR, SSIM, LPIPS, and plotting
+src/utils/                  # Dataset export and comparison figures
+third_party/edge_connect/   # Existing GAN implementation and original license
+configs/                    # GAN test configuration
+scripts/                    # Isolated GAN worker and repository checks
+splits/                     # Preserved evaluation manifest
+assets/                     # Pipeline, qualitative example, metric plots
+results/metrics/historical/ # Six original experiment CSVs
+docs/                       # Usage, methodology, provenance, and validation
 ```
 
-Datasets, checkpoints, full generated outputs, virtual environments, caches, secrets, and `.local/` recovery material are ignored. Their local presence is not evidence they are included in the publication manifest.
+Datasets, model weights, full generated outputs, caches, environments, credentials, and local recovery material are excluded through [.gitignore](.gitignore) and remain local.
 
-## Reproducibility, attribution, and citation
+## Attribution and reproducibility
 
-See [reproducibility](docs/reproducibility.md), [cleanup changes](docs/cleanup_changes.md), and [third-party attribution](docs/third_party.md). Original prompts, model architecture, pipeline arguments, numeric preprocessing, and evaluation formulas are retained. Missing diffusion seeds and unrecorded dependency/model revisions limit exact replication.
+EdgeConnect is adapted from [knazeri/edge-connect](https://github.com/knazeri/edge-connect), with its original [CC BY-NC 4.0 license](third_party/edge_connect/LICENSE.md), README, and local-change record preserved. Stable Diffusion is used through Hugging Face Diffusers. Dataset export uses `phiyodr/InpaintCOCO`. See [third-party attribution](docs/third_party.md) for component provenance and model/asset terms.
 
-Thesis title: *Hybrid Controllable Inpainting: Integrating Diffusion and GAN Mechanisms for Efficient Image Restoration*. Author, institution, completion year, thesis URL, and final citation details require the author's confirmation. `CITATION.cff` deliberately does not invent them.
-
-Please cite the thesis and the EdgeConnect work described in the [preserved upstream README](third_party/edge_connect/README.md). The main `LICENSE` reserves original contribution rights pending the author's license selection; it does not relicense EdgeConnect (CC BY-NC 4.0), other borrowed code, pretrained weights, or dataset-derived figures.
+Original prompts, preprocessing, and metric formulas are preserved. Missing diffusion seeds and unrecorded dataset/model revisions limit exact replication. The main [LICENSE](LICENSE) reserves original-contribution rights pending a license selection; it does not relicense third-party materials. [CITATION.cff](CITATION.cff) records the thesis title; final author/institution/year details remain to be confirmed.

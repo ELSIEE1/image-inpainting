@@ -24,4 +24,6 @@ Added package markers, CLI entry points, isolated GAN worker, effective test YAM
 
 Model architecture and loss implementations are untouched. Existing prompts, pipeline calls, preprocessing formulas, and metric computations are retained. Safe execution edits and original methodological differences are distinguished in `reproducibility.md`. Historical files are protected from evaluator overwrites and checked by hashes.
 
-The first commit is proposed only; no commits, remote repository, or pushes are created by cleanup. `first_commit_files.txt` lists the exact proposed publication paths, including itself. `validation.md` records checks and limitations.
+The initial cleanup was published in commit `0ae784e` on `main`. `first_commit_files.txt` preserves the exact initial 76-file publication manifest, including itself; it is a historical record rather than the current full tree. `validation.md` records checks and limitations.
+
+A subsequent portfolio documentation pass shortened the landing-page README and retained the original detailed instructions in `docs/usage.md`. Model code, dependencies, historical CSVs, split membership, and assets were unchanged.
